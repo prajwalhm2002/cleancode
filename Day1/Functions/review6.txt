@@ -1,0 +1,16 @@
+Review 6
+Issues:
+
+Concatenating strings for file paths (prone to errors).
+
+Hardcoded ./temp/ path (should use Path.Combine).
+
+Suggested Refactor:
+
+public void CreateFile(string name, bool isTemporary = false)
+{
+    string filePath = isTemporary ? Path.Combine("temp", name) : name;
+    Touch(filePath);
+}
+
+Uses Path.Combine() for safer paths.
