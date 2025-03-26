@@ -1,0 +1,29 @@
+Issues:
+
+Uses GetType() and typecasting (as) instead of polymorphism.
+
+Violates Open/Closed Principle (OCP) – Adding a new vehicle requires modifying this function.
+
+Suggested Refactor (Use Polymorphism):
+
+public interface IVehicle
+{
+    void TravelTo(Location location);
+}
+
+public class Bicycle : IVehicle
+{
+    public void TravelTo(Location location) => PeddleTo(location);
+}
+
+public class Car : IVehicle
+{
+    public void TravelTo(Location location) => DriveTo(location);
+}
+
+public Path TravelToTexas(IVehicle vehicle)
+{
+    vehicle.TravelTo(new Location("texas"));
+}
+
+More scalable and maintainable.
