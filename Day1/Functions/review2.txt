@@ -1,0 +1,21 @@
+Review 2
+
+Issues:
+
+Modifying the order's total directly (side effect).
+
+Incorrect return type (void should return decimal).
+
+Lack of validation (e.g., negative discounts).
+
+Suggested Refactor:
+
+public decimal ComputeDiscount(Order order, decimal discountAmount)
+{
+    if (discountAmount < 0)
+        throw new ArgumentException("Discount cannot be negative");
+
+    return order.Total - discountAmount;
+}
+
+More maintainable, avoids side effects, and includes validation.
