@@ -1,0 +1,18 @@
+Review 8
+Issues:
+
+Boolean flag (cancellable) makes function unclear.
+
+Suggested Refactor (Use Method Overloading):
+
+public void CreateMenu(string title, string body, string buttonText)
+{
+    // Default non-cancellable menu
+}
+
+public void CreateCancellableMenu(string title, string body, string buttonText)
+{
+    // Cancellable menu logic
+}
+
+Easier to understand without boolean flags.
