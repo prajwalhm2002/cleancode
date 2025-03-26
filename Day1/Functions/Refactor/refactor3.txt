@@ -1,0 +1,73 @@
+public class EmployeeDatabase 
+{
+    private readonly IDbConnection _db;
+    private const int MinEmployeeId = 50;
+    private const int ChairmanId = 1;
+    private const int MaxNameLength = 150;
+
+    public EmployeeDatabase(IDbConnection dbConnection) 
+    {
+        _db = dbConnection ?? throw new ArgumentNullException(nameof(dbConnection));
+    }
+
+    public Employee GetEmployee(int id) 
+    {
+        if (id < MinEmployeeId)
+            throw new InvalidDataException($"Employee ID must be {MinEmployeeId} or greater. IDs 1-49 are reserved.");
+
+        return _db.QueryFirstOrDefault<Employee>(
+            "SELECT * FROM Employees WHERE Id = @Id", 
+            new { Id = id });
+    }
+
+    public void UpdateEmployee(Employee emp) 
+    {
+        if (emp == null)
+            throw new ArgumentNullException(nameof(emp));
+
+        if (string.IsNullOrWhiteSpace(emp.Name))
+            throw new ArgumentException("Employee name cannot be empty.", nameof(emp.Name));
+
+        if (emp.Name.Length > MaxNameLength)
+            throw new InvalidDataException($"Employee name cannot exceed {MaxNameLength} characters.");
+
+        _db.Execute(
+            "UPDATE Employees SET Name = @Name WHERE Id = @Id", 
+            new { emp.Name, emp.Id });
+    }
+
+    public void DeleteEmployee(int id) 
+    {
+        if (id == ChairmanId)
+            throw new InvalidDataException("The Chairman cannot be removed.");
+
+        _db.Execute(
+            "DELETE FROM Employees WHERE Id = @Id", 
+            new { Id = id });
+    }
+}
+
+public class EmployeeService 
+{
+    private readonly EmployeeDatabase _db;
+
+    public EmployeeService(EmployeeDatabase db) 
+    {
+        _db = db ?? throw new ArgumentNullException(nameof(db));
+    }
+
+    public Employee GetEmployee(int id) 
+    {
+        return _db.GetEmployee(id);
+    }
+
+    public void UpdateEmployee(Employee emp) 
+    {
+        _db.UpdateEmployee(emp);
+    }
+
+    public void RemoveEmployee(int id) 
+    {
+        _db.DeleteEmployee(id);
+    }
+}
