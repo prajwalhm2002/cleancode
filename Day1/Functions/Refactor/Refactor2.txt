@@ -1,0 +1,38 @@
+public class OrderService
+{
+    private const decimal TAX_RATE = 0.08m;
+
+    public void ProcessOrder(Order order)
+    {
+        ValidateOrder(order);
+        order.Total = CalculateTotal(order);
+
+        SaveToDatabase(order);
+        SendConfirmationEmail(order.CustomerEmail, order.Total);
+    }
+
+    public void ApplyDiscount(Order order, decimal discountPercent)
+    {
+        ValidateOrder(order);
+
+        decimal totalBeforeDiscount = CalculateTotal(order);
+        order.Total = totalBeforeDiscount * (1 - discountPercent);
+
+        UpdateDatabase(order);
+    }
+
+    private void ValidateOrder(Order order)
+    {
+        if (order == null)
+            throw new ArgumentNullException(nameof(order));
+        if (order.Items == null || order.Items.Count == 0)
+            throw new InvalidOperationException("Order must contain at least one item.");
+    }
+
+    private decimal CalculateTotal(Order order)
+    {
+        decimal subtotal = order.Items.Sum(item => item.Price * item.Quantity);
+        decimal tax = subtotal * TAX_RATE;
+        return subtotal + tax;
+    }
+}
