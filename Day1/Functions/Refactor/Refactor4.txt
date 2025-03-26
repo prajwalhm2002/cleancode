@@ -1,0 +1,76 @@
+public class PatientVitalsService
+{
+    private static readonly HashSet<string> ValidBloodTypes = new() 
+    { 
+        "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-" 
+    };
+
+    private const double MinTemperature = 34.0;
+    private const double MaxTemperature = 42.0;
+    private const int MinSystolicBP = 70;
+    private const int MaxSystolicBP = 200;
+    private const int MinDiastolicBP = 40;
+    private const int MaxDiastolicBP = 120;
+    private const int MinHeartRate = 40;
+    private const int PostMealBPThreshold = 90;
+    private const int PostMealHoursLimit = 2;
+
+    public void RecordVitals(
+        int patientId,
+        double temperature,
+        int systolic,
+        int diastolic,
+        int heartRate,
+        string bloodType,
+        int age,     
+        DateTime lastMealTime)
+    {
+        ValidateTemperature(temperature);
+        ValidateBloodPressure(systolic, diastolic);
+        ValidateHeartRate(heartRate, age);
+        ValidateBloodType(bloodType);
+        CheckPostMealBloodPressure(diastolic, lastMealTime);
+    }
+
+    private void ValidateTemperature(double temperature)
+    {
+        if (temperature < MinTemperature || temperature > MaxTemperature)
+            throw new ArgumentException($"Temperature must be between {MinTemperature}°C and {MaxTemperature}°C.");
+    }
+
+    private void ValidateBloodPressure(int systolic, int diastolic)
+    {
+        if (systolic < MinSystolicBP || systolic > MaxSystolicBP)
+            throw new ArgumentException($"Systolic BP must be between {MinSystolicBP} and {MaxSystolicBP} mmHg.");
+
+        if (diastolic < MinDiastolicBP || diastolic > MaxDiastolicBP)
+            throw new ArgumentException($"Diastolic BP must be between {MinDiastolicBP} and {MaxDiastolicBP} mmHg.");
+
+        if (diastolic > systolic)
+            throw new ArgumentException("Diastolic BP cannot be greater than systolic BP.");
+    }
+
+    private void ValidateHeartRate(int heartRate, int age)
+    {
+        int maxHeartRate = 220 - age;
+        if (heartRate < MinHeartRate || heartRate > maxHeartRate * 1.2)
+            throw new ArgumentException($"Heart rate must be between {MinHeartRate} and {maxHeartRate * 1.2} bpm for age {age}.");
+    }
+
+    private void ValidateBloodType(string bloodType)
+    {
+        if (!ValidBloodTypes.Contains(bloodType))
+            throw new ArgumentException("Invalid blood type. Must be one of A+, A-, B+, B-, AB+, AB-, O+, O-.");
+    }
+
+    private void CheckPostMealBloodPressure(int diastolic, DateTime lastMealTime)
+    {
+        if ((DateTime.Now - lastMealTime).TotalHours < PostMealHoursLimit && diastolic > PostMealBPThreshold)
+            TriggerAlert("Elevated postprandial blood pressure");
+    }
+
+    private void TriggerAlert(string message)
+    {
+        Console.WriteLine($"[ALERT]: {message}"); // Placeholder for actual alert mechanism
+    }
+}
