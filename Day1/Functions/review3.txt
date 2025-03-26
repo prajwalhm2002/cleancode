@@ -1,0 +1,20 @@
+Review 3
+Issues:
+
+Double negative in function name (IsDOMNodeNotPresent).
+
+Hard to read in if condition (!IsDOMNodeNotPresent(node)).
+
+Suggested Refactor:
+
+public bool IsDOMNodePresent(string node)
+{
+    // ...
+}
+
+if (IsDOMNodePresent(node))
+{
+    // ...
+}
+
+Clearer and avoids confusion.
